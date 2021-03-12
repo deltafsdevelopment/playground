@@ -119,7 +119,18 @@
     }
 
     function loadAsyncApi(asyncApiUrl) {
-      fetch(asyncApiUrl)
+      let url = asyncApiUrl;
+      let headers = new Headers();  
+      let credIndex = url.indexOf("@");    
+      if (credIndex != -1) {
+        let creds = url.substr(8,credIndex-8).split(":");
+        headers.append('Authorization', 'Basic ' + btoa(creds[0] + ":" + creds[1])); 
+        url = url.substr(0,8) + url.substr(credIndex+1);      
+      }   
+    
+      fetch(url, {method:'GET',
+          headers: headers
+        })
         .then(function (response) {
           if (!response.ok) throw new Error(response.statusText);
           return response.text();
